@@ -1,0 +1,16 @@
+[package]
+name = "palettizer"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = { version = "1.0.95", features = ["backtrace"] }
+axum = { version = "0.8.1", features = ["multipart"] }
+bytes = { version = "1.10.0", features = ["std"] }
+image = "0.25.5"
+serde = { version = "1.0.217", features = ["derive"] }
+tera = "1.20.0"
+tokio = { version = "1.43.0", features = ["full"] }
+toml = "0.8.20"
+tracing = "0.1.41"
+tracing-subscriber = "0.3.19"

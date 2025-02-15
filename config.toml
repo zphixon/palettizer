@@ -1,0 +1,6 @@
+bind = "127.0.0.1:30305"
+root = "/voronoi"
+
+[templates]
+error = "templates/error.html"
+index = "templates/index.html"
