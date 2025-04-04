@@ -8,7 +8,6 @@ use axum::{
     Router,
 };
 use image::{GenericImage, GenericImageView, Pixel};
-use serde::Deserialize;
 use std::{
     collections::{BTreeSet, HashMap},
     net::SocketAddr,
@@ -17,23 +16,22 @@ use std::{
 };
 use tera::{Context, Tera};
 
-#[derive(Deserialize)]
-struct Config {
+from_env::config!(
+    "Palettizer",
     root: String,
     bind: SocketAddr,
-    templates: Templates,
-}
-
-#[derive(Deserialize)]
-struct Templates {
-    error: PathBuf,
-    index: PathBuf,
-}
+    templates {
+        error: PathBuf,
+        index: PathBuf,
+    }
+);
 
 static CONFIG: LazyLock<Config> = LazyLock::new(|| {
     let arg = std::env::args().nth(1).expect("need config filename arg");
     let content = std::fs::read_to_string(arg).expect("could not read config file");
-    toml::from_str::<Config>(&content).expect("invalid TOML")
+    let mut config = toml::from_str::<Config>(&content).expect("invalid TOML");
+    config.hydrate_from_env();
+    config
 });
 
 static ERROR_TEMPLATE: &str = "error";
@@ -108,6 +106,7 @@ impl From<anyhow::Error> for AppError {
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt::init();
+    tracing::info!("Bind to {}", CONFIG.bind);
 
     let app = Router::new()
         .route(&CONFIG.root, get(index))
